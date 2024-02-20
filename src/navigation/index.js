@@ -4,6 +4,7 @@ import Splash from "../Splash";
 import Login from "../screens/Login";
 import Profile from "../screens/Profile";
 import Home from "../screens/Home";
+import Listing from "../screens/Listing";
 import { NavigationContainer } from "@react-navigation/native";
 
 const Index = () => {
@@ -21,6 +22,7 @@ const Index = () => {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Listing" component={Listing} />
       </Stack.Navigator>
     </NavigationContainer>
   );

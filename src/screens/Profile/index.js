@@ -3,7 +3,7 @@ import { Text, View, Dimensions } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-const Index = () => {
+const Index = ({ navigation }) => {
   return (
     <View>
       <View
@@ -239,6 +239,24 @@ const Index = () => {
             <Text>Hello</Text>
           </View>
         </View>
+      </View>
+
+      <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
+        <Text
+          style={{
+            backgroundColor: "#f55a00",
+            padding: 10,
+            width: 200,
+            justifyContent: "flex-end",
+            color: "white",
+            margin: 15,
+            borderRadius: 15,
+            textAlign: "center",
+          }}
+          onPress={() => navigation.navigate("Listing")}
+        >
+          Navigate To Listing
+        </Text>
       </View>
     </View>
   );

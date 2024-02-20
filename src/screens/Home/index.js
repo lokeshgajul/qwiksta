@@ -235,6 +235,20 @@ const Index = ({ navigation }) => {
           >
             Navigate To Profile
           </Text>
+          <Text
+            style={{
+              backgroundColor: "#f55a00",
+              padding: 10,
+              width: 200,
+              color: "white",
+              marginBottom: 15,
+              borderRadius: 15,
+              textAlign: "center",
+            }}
+            onPress={() => navigation.navigate("Listing")}
+          >
+            Navigate To Listing
+          </Text>
         </View>
       </View>
     </ScrollView>
