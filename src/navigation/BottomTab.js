@@ -1,52 +1,117 @@
-// import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-// import { View, Text } from "react-native";
-// import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-// import Login from "../Login";
-// import Splash from "../Splash";
-// import Profile from "../Profile";
+import { View, Text, Dimensions } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+const screenWidth = Dimensions.get("screen").width;
 
-// const Tab = createBottomTabNavigator();
+const BottomTabNavigator = () => {
+  const navigation = useNavigation();
+  const [active, setActive] = useState("Home");
 
-// const BottomTabNavigator = () => {
-//   return (
-//     <Tab.Navigator
-//       initialRouteName="Profile"
-//       screenOptions={{
-//         tabBarActiveTintColor: "#e91e63",
-//       }}
-//     >
-//       <Tab.Screen
-//         name="Feed"
-//         component={Login}
-//         options={{
-//           tabBarLabel: "Home",
-//           tabBarIcon: ({ color, size }) => (
-//             <MaterialCommunityIcons name="home" color={color} size={size} />
-//           ),
-//         }}
-//       />
-//       <Tab.Screen
-//         name="Notifications"
-//         component={Splash}
-//         options={{
-//           tabBarLabel: "Updates",
-//           tabBarIcon: ({ color, size }) => (
-//             <MaterialCommunityIcons name="bell" color={color} size={size} />
-//           ),
-//           tabBarBadge: 3,
-//         }}
-//       />
-//       <Tab.Screen
-//         name="Profile"
-//         component={Profile}
-//         options={{
-//           tabBarLabel: "Profile",
-//           tabBarIcon: ({ color, size }) => (
-//             <MaterialCommunityIcons name="account" color={color} size={size} />
-//           ),
-//         }}
-//       />
-//     </Tab.Navigator>
-//   );
-// };
-// export default BottomTabNavigator;
+  const handleTabPress = (tabName) => {
+    setActive(tabName);
+    navigation.navigate(tabName);
+    console.log("Tab ", tabName);
+  };
+
+  const tabBarStyle = (tabName) => {
+    return active === tabName ? "#f55a00" : "#000";
+  };
+  return (
+    <View
+      style={{
+        position: "absolute",
+        bottom: 0,
+        width: screenWidth,
+        justifyContent: "center",
+        height: 65,
+        borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
+        // backgroundColor: "#e6e5e5",
+        backgroundColor: "#fff",
+      }}
+    >
+      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+        <TouchableOpacity
+          style={{ alignItems: "center" }}
+          onPress={() => handleTabPress("BookingForm")}
+        >
+          <MaterialCommunityIcons
+            name="home"
+            size={20}
+            color={tabBarStyle("BookingForm")}
+          />
+          <Text
+            style={{
+              fontSize: 10.5,
+              paddingTop: 5,
+              letterSpacing: 0.4,
+              color: tabBarStyle("BookingForm"),
+            }}
+          >
+            HOME
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{ alignItems: "center" }}
+          onPress={() => handleTabPress("Details")}
+        >
+          <AntDesign name="hearto" size={20} color={tabBarStyle("Details")} />
+          <Text
+            style={{
+              fontSize: 10.5,
+              paddingTop: 5,
+              letterSpacing: 0.4,
+              color: tabBarStyle("Details"),
+            }}
+          >
+            WISHLIST
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{ alignItems: "center" }}
+          onPress={() => handleTabPress("Booking")}
+        >
+          <AntDesign name="book" size={20} color={tabBarStyle("Booking")} />
+          <Text
+            style={{
+              fontSize: 10.5,
+              paddingTop: 5,
+              letterSpacing: 0.4,
+              color: tabBarStyle("Booking"),
+            }}
+          >
+            BOOKINGS
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{ alignItems: "center" }}
+          onPress={() => handleTabPress("Checkout")}
+        >
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color={tabBarStyle("Checkout")}
+          />
+          <Text
+            style={{
+              fontSize: 10.5,
+              paddingTop: 5,
+              letterSpacing: 0.4,
+              color: tabBarStyle("Checkout"),
+            }}
+          >
+            PROFILE
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+export default BottomTabNavigator;

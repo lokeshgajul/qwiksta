@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  StatusBar,
 } from "react-native";
 import bgimg from "../../assets/loginbg.png";
 const screenWidth = Dimensions.get("screen").width;
@@ -18,8 +19,11 @@ const Login = ({ navigation }) => {
   const navigateToSplash = () => {
     navigation.navigate("Home");
   };
+
   return (
     <View style={{ flex: 1 }}>
+      {/* Default status bar */}
+
       <Image
         source={bgimg}
         style={{

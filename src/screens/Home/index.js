@@ -16,7 +16,7 @@ import offer from "../../assets/special-offer.jpg";
 import mumbai from "../../assets/mumbai.jpg";
 import hotel from "../../assets/hotel.jpg";
 const screenWidth = Dimensions.get("screen").width;
-
+import Globalstyles from "../../Global/styles";
 const Index = ({ navigation }) => {
   const [email, setEmail] = useState("");
 
@@ -27,7 +27,7 @@ const Index = ({ navigation }) => {
     <ScrollView>
       <View
         style={{
-          backgroundColor: "#f55a00",
+          backgroundColor: Globalstyles.bgcolor.backgroundColor,
           height: 220,
           justifyContent: "center",
           paddingLeft: 23,
@@ -83,19 +83,19 @@ const Index = ({ navigation }) => {
         <ScrollView horizontal={true} style={styles.parentCard}>
           <TouchableOpacity style={styles.card}>
             <Image style={styles.images} source={mumbai} />
-            <Text style={styles.cityTitle}>Mumbai</Text>
+            <Text style={Globalstyles.colorTitle}>Mumbai </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card}>
             <Image style={styles.images} source={mumbai} />
-            <Text style={styles.cityTitle}>Delhi </Text>
+            <Text style={Globalstyles.colorTitle}>Delhi </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card}>
             <Image style={styles.images} source={mumbai} />
-            <Text style={styles.cityTitle}>Mumbai </Text>
+            <Text style={Globalstyles.colorTitle}>Mumbai </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card}>
             <Image style={styles.images} source={mumbai} />
-            <Text style={styles.cityTitle}>Delhi </Text>
+            <Text style={Globalstyles.colorTitle}>Delhi </Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

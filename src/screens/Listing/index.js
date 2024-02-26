@@ -51,7 +51,7 @@ const Index = ({ navigation }) => {
   };
   const handleTimeConfirm = (time) => {
     const selected = new Date(time);
-    const hour = selected.getHours().toString().padStart(2, "0"); // Get selected hour
+    const hour = selected.getHours();
     setSelectedHour(hour);
     hideTimePicker();
   };
@@ -141,7 +141,7 @@ const Index = ({ navigation }) => {
             <DateTimePickerModal
               isVisible={isTimePickerVisible}
               mode="time"
-              date={initialDate} // Set initial date object with 0 minutes
+              date={initialDate}
               onConfirm={handleTimeConfirm}
               onCancel={hideTimePicker}
             />
@@ -322,6 +322,7 @@ const Index = ({ navigation }) => {
             </View>
           </View>
         </View>
+
         <View style={styles.parentCard}>
           <TouchableOpacity
             style={{
@@ -535,7 +536,6 @@ const styles = StyleSheet.create({
   },
   input: {
     padding: 5,
-
     width: "100%",
   },
   parentCard: {
