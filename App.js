@@ -6,8 +6,6 @@ import Navigation from "./src/navigation";
 import BottomTabNavigator from "./src/navigation/BottomTab";
 import { StatusBar } from "expo-status-bar";
 
-const screenWidth = Dimensions.get("screen").width;
-
 export default function App() {
   const currentNav = useRef();
   const fromNav = useRef();
