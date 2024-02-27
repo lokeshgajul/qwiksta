@@ -8,6 +8,7 @@ import {
   Image,
   Dimensions,
   StatusBar,
+  ScrollView,
 } from "react-native";
 import bgimg from "../../assets/loginbg.png";
 const screenWidth = Dimensions.get("screen").width;
@@ -88,7 +89,7 @@ const Login = ({ navigation }) => {
     }
   };
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }}>
       {/* Default status bar */}
 
       <Image
@@ -191,7 +192,7 @@ const Login = ({ navigation }) => {
         )}
         <Text style={styles.text}> Terms & Conditions | Privacy Policy </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
