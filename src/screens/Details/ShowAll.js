@@ -10,7 +10,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Fontisto from "react-native-vector-icons/Fontisto";
 
-const ShowAll = () => {
+const ShowAll = ({ details }) => {
   const [showItems, setshowItems] = useState(false);
 
   const data = [
@@ -56,7 +56,7 @@ const ShowAll = () => {
               marginLeft: 10,
             }}
           >
-            {item.title}
+            {details.title}
           </Text>
         </View>
       </View>
@@ -87,7 +87,7 @@ const ShowAll = () => {
         <Text style={styles.header}>Amenities & Facilities</Text>
       </View>
       <FlatList
-        data={showItems ? data : data.slice(0, 3)}
+        data={showItems ? details : details}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         ListFooterComponent={renderFooter}

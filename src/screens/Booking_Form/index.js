@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,9 +11,104 @@ import {
 import AntDesign from "react-native-vector-icons/AntDesign";
 import GlobalStyles from "../../Global/styles";
 const screenWidth = Dimensions.get("screen").width;
-import path from "../../assets/path.png";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const Index = () => {
+  const [increment, setIncrement] = useState(1);
+  const [childrenIncrement, setChildrenIncrement] = useState(0);
+  const [roomIncrement, setRoomIncrement] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(1);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [CheckoutoutDateVisibility, setCheckoutoutDateVisibility] =
+    useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [minDate, setminDate] = useState(new Date());
+  const [checkOut, setCheckOut] = useState(new Date());
+  const [selectedBookingTime, setSelectedBookingTime] = useState(null);
+
+  const bookingTimes = [
+    {
+      id: 1,
+      time: "3 HOUR",
+      price: "300",
+    },
+    {
+      id: 2,
+      time: "6 HOUR",
+      price: "600",
+    },
+    {
+      id: 3,
+      time: "FULL DAY",
+      price: "1000",
+    },
+  ];
+
+  const handleSelectBookingTime = (bookingTime) => {
+    setSelectedBookingTime(bookingTime);
+  };
+  const handleActive = (index) => {
+    setActiveIndex(index);
+    console.log("booking index", index);
+  };
+
+  const showCheckOUtDatePicker = () => {
+    setCheckoutoutDateVisibility(true);
+  };
+
+  const hideCheckOUtDatePicker = () => {
+    setCheckoutoutDateVisibility(false);
+  };
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleCheckoutConfirm = (date) => {
+    setCheckOut(date);
+    hideCheckOUtDatePicker();
+  };
+
+  const handleDateConfirm = (date) => {
+    setSelectedDate(date);
+    hideDatePicker();
+  };
+
+  const handleIncrement = () => {
+    setIncrement(increment + 1);
+    setChildrenIncrement(childrenIncrement + 1);
+  };
+  const handleDecrement = () => {
+    setIncrement(increment - 1);
+    setChildrenIncrement(childrenIncrement - 1);
+  };
+
+  const handleChildrenIncrement = () => {
+    setChildrenIncrement(childrenIncrement + 1);
+  };
+  const handleChildrenDecrement = () => {
+    setChildrenIncrement(childrenIncrement - 1);
+  };
+
+  useEffect(() => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setCheckOut(newDate);
+    setminDate(newDate);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    setRoomIncrement((increment % 2) + Math.floor(increment / 2));
+  }, [increment]);
+
+  const maxCount = 10;
+  const minCount = 1;
+  const minchildCount = 0;
+  const maxChildCount = 20;
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -51,6 +146,7 @@ const Index = () => {
               </Text>
             </View>
           </View>
+
           <View
             style={{
               flexDirection: "row",
@@ -60,83 +156,46 @@ const Index = () => {
               backgroundColor: "#f0f0f0",
             }}
           >
-            <TouchableOpacity
-              style={{
-                padding: 5,
-                backgroundColor: GlobalStyles.bgcolor.backgroundColor,
-                width: screenWidth / 3 - 15,
-                borderRadius: 10,
-              }}
-            >
-              <Text
+            {bookingTimes.map((timings, index) => (
+              <TouchableOpacity
+                key={timings.id}
                 style={{
-                  color: "#fff",
-                  fontWeight: "600",
-                  textAlign: "center",
+                  padding: 5,
+                  backgroundColor:
+                    activeIndex === index
+                      ? GlobalStyles.bgcolor.backgroundColor
+                      : "#f3f3f3",
+                  width: screenWidth / 3 - 15,
+                  borderRadius: 10,
+                }}
+                onPress={() => {
+                  handleActive(index);
+                  handleSelectBookingTime(timings);
                 }}
               >
-                3 HOUR
-              </Text>
-              <Text
-                style={{
-                  color: "#fff",
-                  fontWeight: "600",
-                  textAlign: "center",
-                }}
-              >
-                ₹600
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                padding: 5,
-                width: screenWidth / 3 - 15,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#000",
-                  fontWeight: "600",
-                  textAlign: "center",
-                }}
-              >
-                3 HOUR
-              </Text>
-              <Text
-                style={{
-                  color: GlobalStyles.colorTitle.color,
-                  fontWeight: "600",
-                  textAlign: "center",
-                }}
-              >
-                ₹600
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                padding: 5,
-                width: screenWidth / 3 - 15,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#000",
-                  fontWeight: "600",
-                  textAlign: "center",
-                }}
-              >
-                3 HOUR
-              </Text>
-              <Text
-                style={{
-                  color: GlobalStyles.colorTitle.color,
-                  fontWeight: "600",
-                  textAlign: "center",
-                }}
-              >
-                ₹600
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={{
+                    color: activeIndex === index ? "#fff" : "#000",
+                    fontWeight: "600",
+                    textAlign: "center",
+                  }}
+                >
+                  {timings.time}
+                </Text>
+                <Text
+                  style={{
+                    color:
+                      activeIndex === index
+                        ? "#fff"
+                        : GlobalStyles.colorTitle.color,
+                    fontWeight: "600",
+                    textAlign: "center",
+                  }}
+                >
+                  {timings.price}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
@@ -151,11 +210,11 @@ const Index = () => {
         >
           <View style={{ width: screenWidth / 2 }}>
             <Text style={{ paddingTop: 15, fontSize: 13 }}>Date</Text>
-            <Text
+            <TouchableOpacity
+              onPress={showDatePicker}
               style={{
                 marginTop: 10,
-                paddingTop: 8,
-                paddingBottom: 4,
+                paddingVertical: 5,
                 paddingLeft: 15,
                 borderRadius: 20,
                 borderColor: "#efe9e9",
@@ -165,28 +224,66 @@ const Index = () => {
                 fontSize: 12,
               }}
             >
-              29/08/2022
-            </Text>
+              <Text>{new Date(selectedDate).toLocaleDateString()}</Text>
+            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleDateConfirm}
+              onCancel={hideDatePicker}
+            />
           </View>
-          <View style={{ width: screenWidth / 2 }}>
-            <Text style={{ paddingTop: 15, fontSize: 13 }}>Time</Text>
-            <Text
-              style={{
-                marginTop: 10,
-                paddingTop: 8,
-                paddingBottom: 4,
-                paddingLeft: 15,
-                borderRadius: 20,
-                borderColor: "#efe9e9",
-                borderWidth: 2,
-                width: screenWidth / 2 - 40,
-                textAlign: "left",
-                fontSize: 12,
-              }}
-            >
-              05:00 PM
-            </Text>
-          </View>
+
+          {selectedBookingTime && selectedBookingTime.id === 3 ? (
+            <View style={{ width: screenWidth / 2 }}>
+              <Text style={{ paddingTop: 15, fontSize: 13 }}>
+                Checkout Date
+              </Text>
+              <TouchableOpacity
+                onPress={showCheckOUtDatePicker}
+                style={{
+                  marginTop: 10,
+                  paddingVertical: 5,
+                  paddingLeft: 15,
+                  borderRadius: 20,
+                  borderColor: "#efe9e9",
+                  borderWidth: 2,
+                  width: screenWidth / 2 - 40,
+                  textAlign: "left",
+                  fontSize: 12,
+                }}
+              >
+                <Text>{new Date(checkOut).toLocaleDateString()}</Text>
+              </TouchableOpacity>
+              <DateTimePickerModal
+                isVisible={CheckoutoutDateVisibility}
+                mode="date"
+                onConfirm={handleCheckoutConfirm}
+                onCancel={hideCheckOUtDatePicker}
+                minimumDate={minDate}
+              />
+            </View>
+          ) : (
+            <View style={{ width: screenWidth / 2 }}>
+              <Text style={{ paddingTop: 15, fontSize: 13 }}>Time</Text>
+              <Text
+                style={{
+                  marginTop: 10,
+                  paddingTop: 8,
+                  paddingBottom: 4,
+                  paddingLeft: 15,
+                  borderRadius: 20,
+                  borderColor: "#efe9e9",
+                  borderWidth: 2,
+                  width: screenWidth / 2 - 40,
+                  textAlign: "left",
+                  fontSize: 12,
+                }}
+              >
+                05:00 PM
+              </Text>
+            </View>
+          )}
         </View>
 
         <View
@@ -197,7 +294,13 @@ const Index = () => {
             paddingBottom: 15,
           }}
         >
-          <View style={{ flexDirection: "row" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              // width: screenWidth / 2,
+            }}
+          >
             <View style={{ width: screenWidth / 3 }}>
               <Text style={{ paddingTop: 15, fontSize: 13 }}>Rooms </Text>
               <Text
@@ -208,49 +311,75 @@ const Index = () => {
                   backgroundColor: "#efe9e9",
                   borderColor: "#efe9e9",
                   borderWidth: 2,
-                  width: screenWidth / 3 - 40,
+                  width: screenWidth / 3 - 25,
                   textAlign: "center",
                   fontSize: 12,
                 }}
               >
-                1
+                {roomIncrement}
               </Text>
             </View>
 
             <View style={{ width: screenWidth / 3 }}>
               <Text style={{ paddingTop: 15, fontSize: 13 }}>Adults </Text>
-              <Text
+              <View
                 style={{
                   marginTop: 10,
                   borderRadius: 20,
                   padding: 5,
                   borderColor: "#efe9e9",
                   borderWidth: 2,
-                  width: screenWidth / 3 - 40,
-                  textAlign: "center",
-                  fontSize: 12,
+                  width: screenWidth / 3 - 30,
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
                 }}
               >
-                1
-              </Text>
+                <TouchableOpacity
+                  onPress={handleDecrement}
+                  disabled={increment === minCount}
+                >
+                  <AntDesign name="minuscircle" size={16} color="#000" />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 12 }}> {increment}</Text>
+                <TouchableOpacity
+                  onPress={handleIncrement}
+                  disabled={increment === maxCount}
+                >
+                  <Ionicons name="add-circle-sharp" size={20} color="#000" />
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <View style={{ width: screenWidth / 3 }}>
+            <View style={{ width: screenWidth }}>
               <Text style={{ paddingTop: 15, fontSize: 13 }}>Children </Text>
-              <Text
+              <View
                 style={{
                   marginTop: 10,
                   borderRadius: 20,
                   padding: 5,
                   borderColor: "#efe9e9",
                   borderWidth: 2,
-                  width: screenWidth / 3 - 40,
-                  textAlign: "center",
-                  fontSize: 12,
+                  width: screenWidth / 3 - 30,
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
                 }}
               >
-                1
-              </Text>
+                <TouchableOpacity
+                  onPress={handleChildrenDecrement}
+                  disabled={childrenIncrement === minchildCount}
+                >
+                  <AntDesign name="minuscircle" size={16} color="#000" />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 12 }}> {childrenIncrement}</Text>
+                <TouchableOpacity
+                  onPress={handleChildrenIncrement}
+                  disabled={childrenIncrement === maxChildCount}
+                >
+                  <Ionicons name="add-circle-sharp" size={20} color="#000" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 

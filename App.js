@@ -21,7 +21,7 @@ export default function App() {
         onStateChange={async () => console.log(fromNav.current)}
       >
         <Navigation />
-        <BottomTabNavigator />
+        {/* <BottomTabNavigator /> */}
       </NavigationContainer>
     </GestureHandlerRootView>
   );

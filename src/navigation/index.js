@@ -8,6 +8,7 @@ import Listing from "../screens/Listing";
 import Booking from "../screens/Booking";
 import Checkout from "../screens/Checkout";
 import BookingForm from "../screens/Booking_Form";
+import ProfileDetails from "../screens/Profile/ProfileDetails";
 import Details from "../screens/Details";
 
 const Index = () => {
@@ -22,13 +23,14 @@ const Index = () => {
       }}
     >
       <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="Listing" component={Listing} />
       <Stack.Screen name="Booking" component={Booking} />
       <Stack.Screen name="Details" component={Details} />
       <Stack.Screen name="Checkout" component={Checkout} />
       <Stack.Screen name="BookingForm" component={BookingForm} />
+      <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
       <Stack.Screen name="Splash" component={Splash} />
     </Stack.Navigator>
   );

@@ -1,15 +1,36 @@
+import React, { useEffect, useState } from "react";
 import { View, Text, Dimensions } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
+
 const screenWidth = Dimensions.get("screen").width;
 
 const BottomTabNavigator = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const [active, setActive] = useState("Home");
+
+  useEffect(() => {
+    // Check the initial route and set the active tab accordingly
+    if (route.name) {
+      setActive(route.name);
+    }
+  }, [route.name]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Update active tab based on the current route name
+      setActive(route.name);
+      console.log("tab changed:", route.name);
+    }, [route.name])
+  );
 
   const handleTabPress = (tabName) => {
     setActive(tabName);
@@ -20,6 +41,7 @@ const BottomTabNavigator = () => {
   const tabBarStyle = (tabName) => {
     return active === tabName ? "#f55a00" : "#000";
   };
+
   return (
     <View
       style={{
@@ -30,26 +52,25 @@ const BottomTabNavigator = () => {
         height: 65,
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
-        // backgroundColor: "#e6e5e5",
         backgroundColor: "#fff",
       }}
     >
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         <TouchableOpacity
           style={{ alignItems: "center" }}
-          onPress={() => handleTabPress("BookingForm")}
+          onPress={() => handleTabPress("Home")}
         >
           <MaterialCommunityIcons
             name="home"
             size={20}
-            color={tabBarStyle("BookingForm")}
+            color={tabBarStyle("Home")}
           />
           <Text
             style={{
               fontSize: 10.5,
               paddingTop: 5,
               letterSpacing: 0.4,
-              color: tabBarStyle("BookingForm"),
+              color: tabBarStyle("Home"),
             }}
           >
             HOME
@@ -58,15 +79,15 @@ const BottomTabNavigator = () => {
 
         <TouchableOpacity
           style={{ alignItems: "center" }}
-          onPress={() => handleTabPress("Details")}
+          onPress={() => handleTabPress("Checkout")}
         >
-          <AntDesign name="hearto" size={20} color={tabBarStyle("Details")} />
+          <AntDesign name="hearto" size={20} color={tabBarStyle("Checkout")} />
           <Text
             style={{
               fontSize: 10.5,
               paddingTop: 5,
               letterSpacing: 0.4,
-              color: tabBarStyle("Details"),
+              color: tabBarStyle("Checkout"),
             }}
           >
             WISHLIST
@@ -92,19 +113,19 @@ const BottomTabNavigator = () => {
 
         <TouchableOpacity
           style={{ alignItems: "center" }}
-          onPress={() => handleTabPress("Checkout")}
+          onPress={() => handleTabPress("Profile")}
         >
           <Ionicons
             name="person-outline"
             size={20}
-            color={tabBarStyle("Checkout")}
+            color={tabBarStyle("Profile")}
           />
           <Text
             style={{
               fontSize: 10.5,
               paddingTop: 5,
               letterSpacing: 0.4,
-              color: tabBarStyle("Checkout"),
+              color: tabBarStyle("Profile"),
             }}
           >
             PROFILE

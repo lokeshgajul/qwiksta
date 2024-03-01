@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Image,
@@ -8,18 +8,52 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import map from "../../assets/Hotel2.jpg";
-import img1 from "../../assets/Hotel1.jpg";
 import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Entypo from "react-native-vector-icons/Entypo";
-import ShowAll from "./ShowAll";
+import axios from "axios";
 
 const screenWidth = Dimensions.get("screen").width;
 const imageHeight = Dimensions.get("screen").height;
 
-const Details = () => {
+const Details = ({ navigation, route }) => {
+  const itemID = route.params;
+
+  const [details, setDetails] = useState(null);
+  const [showItems, setshowItems] = useState(false);
+
+  const toggleShowAll = () => {
+    setshowItems(!showItems);
+  };
+
+  const getDetailsOfHotel = async () => {
+    try {
+      const itemIdValue = itemID.itemId;
+      const response = await axios.get(
+        `https://qwiksta.com/api/single?id=${itemIdValue}`
+      );
+      const data = response.data;
+      if (data && data.post) {
+        setDetails(data.post);
+      } else {
+        console.log("No post data found in the response.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getDetailsOfHotel();
+  }, []);
+
+  if (!details) {
+    return <Text>Loading...</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -71,27 +105,18 @@ const Details = () => {
           </View>
         </View>
         <ScrollView horizontal={true}>
-          <View style={{ flexDirection: "row" }}>
-            <View style={styles.imgView}>
-              <Image source={img1} style={styles.img}></Image>
-            </View>
-
-            <View style={styles.imgView}>
-              <Image source={img1} style={styles.img}></Image>
-            </View>
-            <View style={[styles.imgView]}>
-              <Image source={img1} style={styles.img}></Image>
-            </View>
-            <View style={styles.imgView}>
-              <Image source={img1} style={styles.img}></Image>
-            </View>
-            <View style={styles.imgView}>
-              <Image source={img1} style={styles.img}></Image>
-            </View>
-          </View>
+          {details.gallery.map((item, index) => {
+            return (
+              <View style={{ flexDirection: "row" }} key={index}>
+                <View style={styles.imgView}>
+                  <Image source={{ uri: item }} style={styles.img}></Image>
+                </View>
+              </View>
+            );
+          })}
         </ScrollView>
 
-        <View style={{ backgroundColor: "#fff", height: 160 }}>
+        <View style={{ backgroundColor: "#fff", paddingBottom: 20 }}>
           <View style={styles.button_container}>
             <TouchableOpacity style={styles.button1}>
               <Text style={{ fontSize: 10, fontWeight: "900", color: "#ffff" }}>
@@ -112,11 +137,8 @@ const Details = () => {
           {/* Hotel Avenue */}
 
           <View>
-            <Text style={styles.hotel}>Hotel Avenue</Text>
-            <Text style={styles.text}>
-              1, Kailash Puram Rd, Pereira Wadi, Sakinaka Andheri East
-              Mumbai,Maharashtra 400072
-            </Text>
+            <Text style={styles.hotel}>{details.post_title}</Text>
+            <Text style={styles.text}>{details.location_address}</Text>
           </View>
 
           {/* </View> */}
@@ -143,29 +165,74 @@ const Details = () => {
         </View>
 
         <View style={{ backgroundColor: "#fff", padding: 20, marginTop: 10 }}>
-          <ShowAll />
+          {/* <ShowAll details={details} /> */}
+          <View>
+            <Text style={{ fontSize: 15, fontWeight: "400" }}>
+              Amenities & Facilities
+            </Text>
+          </View>
+          {details ? (
+            details.space_amenity.map((item, id) => {
+              return (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                  key={id}
+                >
+                  <Text>{item.des}</Text>
+                  <Text
+                    style={{
+                      lineHeight: 25,
+                      fontSize: 12,
+                      fontWeight: "400",
+                      marginLeft: 10,
+                    }}
+                  >
+                    {item}
+                  </Text>
+                </View>
+              );
+            })
+          ) : (
+            <Text>No Amenities available </Text>
+          )}
         </View>
 
-        <View style={{ backgroundColor: "#fff", padding: 20, marginTop: 10 }}>
+        <View
+          style={{
+            backgroundColor: "#fff",
+            padding: 20,
+            marginTop: 10,
+            borderRadius: 10,
+          }}
+        >
           <Text style={styles.hearder}> Location</Text>
-          <Image
-            source={map}
-            style={{
-              width: 320,
-              height: imageHeight / 4,
-              borderRadius: 10,
-              marginTop: 10,
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: details.location_lat,
+              longitude: details.location_lng,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
             }}
-          />
+          >
+            <Marker
+              coordinate={{
+                latitude: details.location_lat,
+                longitude: details.location_lng,
+              }}
+              title={details.post_title}
+              description="This is the hotel's location"
+            />
+          </MapView>
         </View>
 
         <View style={{ backgroundColor: "#fff", padding: 20, marginTop: 10 }}>
           <Text style={styles.hearder}>Hotel Policies</Text>
-          <Text style={styles.policy_title}>
-            6kms away from the International Airport,1Km Away from Asalpha Metro
-            station,6 km Away From Andheri Station ,8kms away from Bombay
-            Exhibition Center '(NESCO)' and ^kms away from Powai lake
-          </Text>
+          <Text style={styles.policy_title}>{details.hotel_policy}</Text>
         </View>
 
         <View style={{ backgroundColor: "#fff", padding: 20, marginTop: 10 }}>
@@ -181,7 +248,10 @@ const Details = () => {
         </View>
       </ScrollView>
       <View>
-        <TouchableOpacity style={styles.footer}>
+        <TouchableOpacity
+          style={styles.footer}
+          onPress={() => navigation.navigate("BookingForm")}
+        >
           <Text style={styles.title}>CHECK AVAILABILITY</Text>
         </TouchableOpacity>
       </View>
@@ -198,6 +268,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     height: imageHeight / 3,
     opacity: 0.7,
+    marginRight: 5,
   },
   img: {
     flex: 1,
@@ -261,6 +332,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "white",
     fontWeight: "500",
+  },
+  map: {
+    width: "99%",
+    height: 200,
+    marginTop: 10,
+    borderRadius: 10, // Add borderRadius here
   },
 });
 

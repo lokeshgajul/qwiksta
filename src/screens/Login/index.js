@@ -14,6 +14,7 @@ import bgimg from "../../assets/loginbg.png";
 const screenWidth = Dimensions.get("screen").width;
 const screenheight = Dimensions.get("screen").height;
 import styles from "./styles";
+import BottomTabNavigator from "../../navigation/BottomTab";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -23,34 +24,28 @@ const Login = ({ navigation }) => {
   const [error, setError] = useState();
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // const navigateToSplash = () => {
-  //   navigation.navigate("Home");
-  //   console.log("data", email, otp);
-  // };
-
   const getOtp = async () => {
     if (!email) {
-      return setEmailMsg("please Enter Email first... ");
+      return setEmailMsg("Please enter your email first.");
     }
-    if (email.length <= 6) {
-      setEmailMsg("email must be 6 characters long");
+    if (email.length < 6) {
+      return setEmailMsg("Email must be at least 6 characters long.");
     }
     try {
       const response = await axios.post(`https://qwiksta.com/api/login-otp`, {
         payload: { email: email },
       });
       if (response.data.status) {
-        console.log("OTP Response : ", response.data.status);
-        console.log("OTP Response : ", response.data.message);
-      } else {
-        console.log("OTP Response : ", response.status);
-        console.log("OTP Response : ", response.data.message);
         setEmailMsg(response.data.message);
-        console.log(email);
-        // Clear the emailMsg after 3 seconds
-        // setTimeout(() => {
-        setEmailMsg("");
-        // }, 3000);
+        setTimeout(() => {
+          setEmailMsg("");
+        }, 3000);
+      } else {
+        setEmailMsg(response.data.message);
+        console.log(response.data.message);
+        setTimeout(() => {
+          setEmailMsg("");
+        }, 3000);
       }
     } catch (error) {
       console.log(error);
@@ -115,32 +110,17 @@ const Login = ({ navigation }) => {
           value={email}
           keyboardType="email-address"
         />
-        {!email && (
+        {emailMsg && (
           <Text
             style={{
-              marginTop: 5,
+              // marginTop: 3,
               color: "red",
               fontWeight: "500",
               fontSize: 12,
               letterSpacing: 0.5,
-              paddingLeft: 5,
             }}
           >
             {emailMsg}
-          </Text>
-        )}
-        {email && email.length < 6 && (
-          <Text
-            style={{
-              marginTop: 5,
-              color: "red",
-              fontWeight: "500",
-              fontSize: 12,
-              letterSpacing: 0.5,
-              paddingLeft: 5,
-            }}
-          >
-            Email must be at least 6 characters long.
           </Text>
         )}
 
@@ -192,6 +172,7 @@ const Login = ({ navigation }) => {
         )}
         <Text style={styles.text}> Terms & Conditions | Privacy Policy </Text>
       </View>
+      <BottomTabNavigator />
     </ScrollView>
   );
 };

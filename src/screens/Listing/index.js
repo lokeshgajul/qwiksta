@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Button,
+  FlatList,
   Image,
   ScrollView,
   StyleSheet,
@@ -17,14 +19,32 @@ import path from "../../assets/path.png";
 import Star from "../../assets/star.png";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import axios from "axios";
 
 const screenWidth = Dimensions.get("screen").width;
-const Index = ({ navigation }) => {
+const Index = ({ navigation, route }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState("select Date ");
   const [selectedTime, setSelectedTime] = useState("select Time ");
   const [selectedHour, setSelectedHour] = useState("00");
+  const [Hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const cityName = route.params.cityName;
+  console.log("City :", cityName);
+
+  const fetchCityHotels = async () => {
+    try {
+      const respose = await axios.get(
+        `https://qwiksta.com/api/search?address=${cityName}&page=1`
+      );
+      const data = respose.data.location;
+      setHotels(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -56,448 +76,281 @@ const Index = ({ navigation }) => {
     hideTimePicker();
   };
 
+  const navigateToDetails = (itemId) => {
+    navigation.navigate("Details", itemId);
+    console.log(itemId);
+  };
+
   const initialDate = new Date();
   initialDate.setMinutes(0);
 
-  return (
-    <View style={{ flex: 1 }}>
-      <ScrollView>
-        <View
+  useEffect(() => {
+    fetchCityHotels();
+  }, []);
+
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.parentCard}>
+        <TouchableOpacity
           style={{
-            height: 160,
+            position: "absolute",
+            top: 20,
+            zIndex: 5,
+            right: 10,
+            padding: 8,
             backgroundColor: "#f15a00",
-            marginBottom: 20,
+            borderRadius: 20,
           }}
         >
-          <View style={styles.header}>
-            <View>
-              <AntDesign name="left" size={20} color="#fff" />
+          <AntDesign name="hearto" size={20} color="#fff" />
+        </TouchableOpacity>
+        <View style={styles.card}>
+          <ScrollView horizontal={true}>
+            {/* <Image style={styles.img} source={{ uri: item.thumbnail }} /> */}
+
+            <TouchableOpacity style={styles.childCard}>
+              <Image style={styles.img} source={{ uri: item.thumbnail }} />
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+        <View style={{ margin: 12, flexDirection: "column" }}>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={styles.hotelName}>{item.title} </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 5,
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                marginRight: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={feather}
+                style={{ marginRight: 3, marginTop: 2, marginRight: 5 }}
+              />
+              <Text style={styles.text}>Local ID Accepted</Text>
             </View>
-            <View style={styles.inputParent}>
-              <TextInput style={styles.input} placeholder="Search city..." />
-              <View
-                style={{
-                  marginLeft: -40,
-                  justifyContent: "center",
-                  borderLeftColor: "grey",
-                  borderLeftWidth: 0.5,
-                  paddingLeft: 10,
-                }}
-              >
-                <Image
-                  source={path}
-                  style={{
-                    marginTop: 2,
-                    tintColor: "#f15a00",
-                  }}
-                />
-              </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginRight: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={feather}
+                style={{ marginTop: 2, marginRight: 2 }}
+              />
+              <Text style={styles.text1}>Couple Friendly</Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                marginRight: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={feather}
+                style={{ marginTop: 2, marginRight: 2 }}
+              />
+              <Text style={styles.text2}>Pay @ Hotel</Text>
             </View>
           </View>
           <View
             style={{
               flexDirection: "row",
+              marginTop: 10,
+            }}
+          >
+            <Image source={location} style={{ marginRight: 3, marginTop: 5 }} />
+            <Text>Map </Text>
+            <Text>- {item.address}</Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 10,
               alignItems: "center",
             }}
           >
-            <TouchableOpacity
-              onPress={showDatePicker}
-              style={{
-                backgroundColor: "#fff",
-                padding: 5,
-                width: "50%",
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                height: 50,
-                flexDirection: "row",
-              }}
-            >
-              <FontAwesome5 name="calendar-alt" size={20} color="#000" />
-              <Text>{selectedDate}</Text>
-            </TouchableOpacity>
+            <Image source={fullStar} style={{ marginRight: 3, marginTop: 2 }} />
+            <Image source={fullStar} style={{ marginRight: 3, marginTop: 2 }} />
+            <Image source={fullStar} style={{ marginRight: 3, marginTop: 2 }} />
+            <Image source={fullStar} style={{ marginRight: 3, marginTop: 2 }} />
+            <Image source={Star} style={{ marginRight: 3, marginTop: 2 }} />
 
-            <TouchableOpacity
-              onPress={showTimePicker}
-              style={{
-                backgroundColor: "#fff",
-                padding: 5,
-                width: "50%",
-                marginLeft: 3,
-                justifyContent: "space-evenly",
-                alignItems: "center",
-                height: 50,
-                flexDirection: "row",
-              }}
-            >
-              <AntDesign name="clockcircle" size={20} color="#000" />
-              <Text>{selectedHour} : 00 </Text>
-            </TouchableOpacity>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleDateConfirm}
-              onCancel={hideDatePicker}
-            />
-            <DateTimePickerModal
-              isVisible={isTimePickerVisible}
-              mode="time"
-              date={initialDate}
-              onConfirm={handleTimeConfirm}
-              onCancel={hideTimePicker}
-            />
+            <Text style={{ marginLeft: 7 }}>{item.rating} </Text>
           </View>
-        </View>
-
-        <View style={styles.parentCard}>
-          <TouchableOpacity
+          <View
             style={{
-              position: "absolute",
-              top: 20,
-              zIndex: 5,
-              right: 10,
-              padding: 8,
-              backgroundColor: "#f15a00",
-              borderRadius: 20,
+              flexDirection: "row",
+              marginTop: 10,
+              justifyContent: "space-between",
             }}
           >
-            <AntDesign name="hearto" size={20} color="#fff" />
-          </TouchableOpacity>
-          <View style={styles.card}>
-            <ScrollView horizontal={true}>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-            </ScrollView>
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                borderColor: "#f15a00",
+                borderWidth: 1,
+                borderRadius: 8,
+                width: 90,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => navigateToDetails({ itemId: item.id })}
+            >
+              <Text> 3 HOUR </Text>
+              <Text style={styles.price}> {item.price} </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                borderColor: "#f15a00",
+                borderWidth: 1,
+                borderRadius: 8,
+                width: 90,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => navigateToDetails({ itemId: item.id })}
+            >
+              <Text> 6 HOUR</Text>
+              <Text style={styles.price}> {item.six_hours} </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                borderColor: "#f15a00",
+                borderWidth: 1,
+                borderRadius: 8,
+                width: 90,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => navigateToDetails({ itemId: item.id })}
+            >
+              <Text> FULL DAY </Text>
+              <Text style={styles.price}> {item.daily} </Text>
+            </TouchableOpacity>
           </View>
-          <View style={{ margin: 12, flexDirection: "column" }}>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.hotelName}>Hotel Avenue </Text>
-            </View>
+        </View>
+      </View>
+    );
+  };
+  return (
+    <View style={{ flex: 1 }}>
+      <View
+        style={{
+          height: 160,
+          backgroundColor: "#f15a00",
+          marginBottom: 20,
+        }}
+      >
+        <View style={styles.header}>
+          <View>
+            <AntDesign name="left" size={20} color="#fff" />
+          </View>
+          <View style={styles.inputParent}>
+            <TextInput style={styles.input} placeholder="Search city..." />
             <View
               style={{
-                flexDirection: "row",
-                marginTop: 5,
-                alignItems: "center",
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginRight: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={feather}
-                  style={{ marginRight: 3, marginTop: 2, marginRight: 5 }}
-                />
-                <Text style={styles.text}>Local ID Accepted</Text>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginRight: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={feather}
-                  style={{ marginTop: 2, marginRight: 2 }}
-                />
-                <Text style={styles.text1}>Couple Friendly</Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginRight: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={feather}
-                  style={{ marginTop: 2, marginRight: 2 }}
-                />
-                <Text style={styles.text2}>Pay @ Hotel</Text>
-              </View>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
+                marginLeft: -40,
+                justifyContent: "center",
+                borderLeftColor: "grey",
+                borderLeftWidth: 0.5,
+                paddingLeft: 10,
               }}
             >
               <Image
-                source={location}
-                style={{ marginRight: 3, marginTop: 5 }}
-              />
-              <Text>Map </Text>
-              <Text>- Sakinaka, Andheri East </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image source={Star} style={{ marginRight: 3, marginTop: 2 }} />
-
-              <Text style={{ marginLeft: 7 }}>4.6 </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-                justifyContent: "space-between",
-              }}
-            >
-              <TouchableOpacity
+                source={path}
                 style={{
-                  padding: 10,
-                  borderColor: "#f15a00",
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  width: 90,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  marginTop: 2,
+                  tintColor: "#f15a00",
                 }}
-              >
-                <Text> 3 HOUR </Text>
-                <Text style={styles.price}> ₹671 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  borderColor: "#f15a00",
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  width: 90,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text> 6 HOUR</Text>
-                <Text style={styles.price}> ₹671 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  borderColor: "#f15a00",
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  width: 90,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text> FULL DAY </Text>
-                <Text style={styles.price}> ₹671 </Text>
-              </TouchableOpacity>
+              />
             </View>
           </View>
         </View>
-
-        <View style={styles.parentCard}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <TouchableOpacity
+            onPress={showDatePicker}
             style={{
-              position: "absolute",
-              top: 20,
-              zIndex: 5,
-              right: 10,
-              padding: 8,
-              backgroundColor: "#f15a00",
-              borderRadius: 20,
+              backgroundColor: "#fff",
+              padding: 5,
+              width: "50%",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              height: 50,
+              flexDirection: "row",
             }}
           >
-            <AntDesign name="hearto" size={20} color="#fff" />
+            <FontAwesome5 name="calendar-alt" size={20} color="#000" />
+            <Text>{selectedDate}</Text>
           </TouchableOpacity>
-          <View style={styles.card}>
-            <ScrollView horizontal={true}>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.childCard}>
-                <Image style={styles.img} source={hotel} />
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-          <View style={{ margin: 12, flexDirection: "column" }}>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.hotelName}>Hotel Avenue </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 5,
-                alignItems: "center",
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginRight: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={feather}
-                  style={{ marginRight: 3, marginTop: 2, marginRight: 5 }}
-                />
-                <Text style={styles.text}>Local ID Accepted</Text>
-              </View>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginRight: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={feather}
-                  style={{ marginTop: 2, marginRight: 2 }}
-                />
-                <Text style={styles.text1}>Couple Friendly</Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginRight: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={feather}
-                  style={{ marginTop: 2, marginRight: 2 }}
-                />
-                <Text style={styles.text2}>Pay @ Hotel</Text>
-              </View>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-              }}
-            >
-              <Image
-                source={location}
-                style={{ marginRight: 3, marginTop: 5 }}
-              />
-              <Text>Map </Text>
-              <Text>- Sakinaka, Andheri East </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image
-                source={fullStar}
-                style={{ marginRight: 3, marginTop: 2 }}
-              />
-              <Image source={Star} style={{ marginRight: 3, marginTop: 2 }} />
-
-              <Text style={{ marginLeft: 7 }}>4.6 </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-                justifyContent: "space-between",
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  borderColor: "#f15a00",
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  width: 90,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text> 3 HOUR </Text>
-                <Text style={styles.price}> ₹671 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  borderColor: "#f15a00",
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  width: 90,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text> 6 HOUR</Text>
-                <Text style={styles.price}> ₹671 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  borderColor: "#f15a00",
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  width: 90,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text> FULL DAY </Text>
-                <Text style={styles.price}> ₹671 </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <TouchableOpacity
+            onPress={showTimePicker}
+            style={{
+              backgroundColor: "#fff",
+              padding: 5,
+              width: "50%",
+              marginLeft: 3,
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              height: 50,
+              flexDirection: "row",
+            }}
+          >
+            <AntDesign name="clockcircle" size={20} color="#000" />
+            <Text>{selectedHour} : 00 </Text>
+          </TouchableOpacity>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleDateConfirm}
+            onCancel={hideDatePicker}
+          />
+          <DateTimePickerModal
+            isVisible={isTimePickerVisible}
+            mode="time"
+            date={initialDate}
+            onConfirm={handleTimeConfirm}
+            onCancel={hideTimePicker}
+          />
         </View>
-      </ScrollView>
+      </View>
+
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color="#f15a00"
+          justifyContent="center"
+          style={{ marginTop: 20 }}
+        />
+      ) : (
+        <FlatList
+          data={Hotels}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          maxToRenderPerBatch={10}
+        />
+      )}
+
       <TouchableOpacity
         style={{
           position: "absolute",
@@ -511,8 +364,6 @@ const Index = ({ navigation }) => {
       >
         <FontAwesome5 name="sun" size={25} color="#fff" />
       </TouchableOpacity>
-
-      <Button title="Back " onPress={() => navigation.navigate("Profile")} />
     </View>
   );
 };

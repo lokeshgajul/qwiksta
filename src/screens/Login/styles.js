@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
   otpButton: {
-    marginTop: 10,
+    marginTop: 5,
   },
   otpText: {
     backgroundColor: "#F35000",
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    marginTop: 20,
+    marginTop: 15,
   },
   buttonText: {
     backgroundColor: "#F35000",
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   text: {
     color: "grey",
     textAlign: "center",
-    marginTop: 20,
+    margin: 8,
   },
 });
 
