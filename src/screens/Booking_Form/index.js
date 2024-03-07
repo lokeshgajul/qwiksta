@@ -5,20 +5,24 @@ import {
   TouchableOpacity,
   Dimensions,
   TextInput,
-  Image,
+  Alert,
+  Modal,
+  Pressable,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import GlobalStyles from "../../Global/styles";
 const screenWidth = Dimensions.get("screen").width;
 import Ionicons from "react-native-vector-icons/Ionicons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import axios from "axios";
 
-const Index = () => {
+const Index = ({ navigation, route }) => {
   const [increment, setIncrement] = useState(1);
   const [childrenIncrement, setChildrenIncrement] = useState(0);
   const [roomIncrement, setRoomIncrement] = useState(1);
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [CheckoutoutDateVisibility, setCheckoutoutDateVisibility] =
     useState(false);
@@ -26,6 +30,12 @@ const Index = () => {
   const [minDate, setminDate] = useState(new Date());
   const [checkOut, setCheckOut] = useState(new Date());
   const [selectedBookingTime, setSelectedBookingTime] = useState(null);
+  const [payModeIndex, setPayModeIndex] = useState();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [availableTime, setAvailableTime] = useState([]);
+  const [timeModal, setTimeModal] = useState(false);
+  const [selectedTime, setSelectedTime] = useState("3hr");
+  const itemId = route.params;
 
   const bookingTimes = [
     {
@@ -45,12 +55,22 @@ const Index = () => {
     },
   ];
 
-  const handleSelectBookingTime = (bookingTime) => {
-    setSelectedBookingTime(bookingTime);
-  };
-  const handleActive = (index) => {
-    setActiveIndex(index);
-    console.log("booking index", index);
+  const paymentMode = [
+    {
+      id: 1,
+      label1: "PAY@HOTEL",
+      label2: "NO DISCOUNT",
+    },
+    {
+      id: 2,
+      label1: "ONLINE",
+      label2: "UPTO 10% DISCOUNT",
+    },
+  ];
+
+  const handlePayModeIndex = (index) => {
+    setPayModeIndex(index);
+    console.log("payment index", index);
   };
 
   const showCheckOUtDatePicker = () => {
@@ -80,11 +100,9 @@ const Index = () => {
 
   const handleIncrement = () => {
     setIncrement(increment + 1);
-    setChildrenIncrement(childrenIncrement + 1);
   };
   const handleDecrement = () => {
     setIncrement(increment - 1);
-    setChildrenIncrement(childrenIncrement - 1);
   };
 
   const handleChildrenIncrement = () => {
@@ -94,12 +112,56 @@ const Index = () => {
     setChildrenIncrement(childrenIncrement - 1);
   };
 
+  const handleGetTime = async () => {
+    try {
+      const itemIdObject = itemId?.itemId;
+      const itemValue = itemIdObject?.itemId;
+
+      const response = await axios.post(`https://qwiksta.com/api/get-time`, {
+        startDate: selectedDate,
+        postID: itemValue,
+        posthour: activeIndex,
+      });
+      console.log("handle Time called ");
+      const data = await response.data;
+      if (data) {
+        setAvailableTime(data.list_times);
+      }
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
+
+  const loadTime = (index, timings) => {
+    setActiveIndex(index);
+    setSelectedBookingTime(timings);
+    switch (timings.id) {
+      case 1:
+        setSelectedTime("3hr");
+        break;
+      case 2:
+        setSelectedTime("6hr");
+        break;
+      case 3:
+        setSelectedTime("full");
+        break;
+
+      default:
+        setSelectedTime("3hr");
+        break;
+    }
+  };
+
   useEffect(() => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 1);
-    setCheckOut(newDate);
-    setminDate(newDate);
-  }, [selectedDate]);
+    if (selectedTime == "full") {
+      const newDate = new Date(selectedDate);
+      newDate.setDate(newDate.getDate() + 1);
+      setCheckOut(newDate);
+      setminDate(newDate);
+    } else {
+      handleGetTime();
+    }
+  }, [selectedDate, selectedTime]);
 
   useEffect(() => {
     setRoomIncrement((increment % 2) + Math.floor(increment / 2));
@@ -111,6 +173,7 @@ const Index = () => {
   const maxChildCount = 20;
   return (
     <View style={{ flex: 1 }}>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <ScrollView>
         <View
           style={{
@@ -126,7 +189,7 @@ const Index = () => {
               alignItems: "center",
             }}
           >
-            <View
+            <Pressable
               style={{
                 backgroundColor: "#f55a00",
                 padding: 8,
@@ -134,9 +197,10 @@ const Index = () => {
                 alignItems: "center",
                 marginTop: 14,
               }}
+              onPress={() => navigation.navigate("Details")}
             >
               <AntDesign name="left" size={20} color="#fff" />
-            </View>
+            </Pressable>
             <View style={{ padding: 20, marginTop: 20 }}>
               <Text style={GlobalStyles.title}>Hotel Avenue</Text>
               <Text style={GlobalStyles.info}>
@@ -169,8 +233,7 @@ const Index = () => {
                   borderRadius: 10,
                 }}
                 onPress={() => {
-                  handleActive(index);
-                  handleSelectBookingTime(timings);
+                  loadTime(index, timings);
                 }}
               >
                 <Text
@@ -264,25 +327,59 @@ const Index = () => {
               />
             </View>
           ) : (
-            <View style={{ width: screenWidth / 2 }}>
-              <Text style={{ paddingTop: 15, fontSize: 13 }}>Time</Text>
-              <Text
-                style={{
-                  marginTop: 10,
-                  paddingTop: 8,
-                  paddingBottom: 4,
-                  paddingLeft: 15,
-                  borderRadius: 20,
-                  borderColor: "#efe9e9",
-                  borderWidth: 2,
-                  width: screenWidth / 2 - 40,
-                  textAlign: "left",
-                  fontSize: 12,
+            <>
+              <Modal
+                animationType="fade"
+                transparent={true}
+                visible={timeModal}
+                onRequestClose={() => {
+                  Alert.alert("Modal has been closed.");
+                  setTimeModal(!timeModal);
                 }}
               >
-                05:00 PM
-              </Text>
-            </View>
+                <View style={GlobalStyles.centeredView}>
+                  <View style={GlobalStyles.TimeModalView}>
+                    <Pressable
+                      style={[GlobalStyles.button, GlobalStyles.buttonClose]}
+                      onPress={() => setTimeModal(!timeModal)}
+                    >
+                      <AntDesign name="close" color="#fff" />
+                    </Pressable>
+                    <ScrollView style={GlobalStyles.timeModalContent}>
+                      {availableTime.map((list, index) => {
+                        return (
+                          <Text key={index} style={GlobalStyles.timeModalText}>
+                            {list}
+                          </Text>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
+                </View>
+              </Modal>
+              <TouchableOpacity
+                style={{ width: screenWidth / 2 }}
+                onPress={() => setTimeModal(true)}
+              >
+                <Text style={{ paddingTop: 15, fontSize: 13 }}>Time</Text>
+                <Text
+                  style={{
+                    marginTop: 10,
+                    paddingTop: 8,
+                    paddingBottom: 4,
+                    paddingLeft: 15,
+                    borderRadius: 20,
+                    borderColor: "#efe9e9",
+                    borderWidth: 2,
+                    width: screenWidth / 2 - 40,
+                    textAlign: "left",
+                    fontSize: 12,
+                  }}
+                >
+                  05:00 PM
+                </Text>
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
@@ -383,12 +480,58 @@ const Index = () => {
             </View>
           </View>
 
-          <View style={{ marginTop: 10 }}>
-            <Text style={GlobalStyles.title}>Coupon Code</Text>
+          <View style={{ marginTop: 15 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flex: 1,
+              }}
+            >
+              <Text style={GlobalStyles.title}>Coupon Code</Text>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  Alert.alert("Modal has been closed.");
+                  setModalVisible(!modalVisible);
+                }}
+              >
+                <View style={GlobalStyles.centeredView}>
+                  <View style={GlobalStyles.modalView}>
+                    <Pressable
+                      style={[GlobalStyles.button, GlobalStyles.buttonClose]}
+                      onPress={() => setModalVisible(!modalVisible)}
+                    >
+                      <AntDesign name="close" color="#fff" />
+                    </Pressable>
+                    <View style={GlobalStyles.modalContent}>
+                      <Text style={GlobalStyles.modalText}>Coupon Code 1</Text>
+                      <Text style={GlobalStyles.modalText}>Coupon Code 2</Text>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+              <TouchableOpacity>
+                <Text
+                  style={{
+                    color: "#F2600A",
+                    fontWeight: "600",
+                    letterSpacing: 0.2,
+                    fontSize: 13,
+                  }}
+                  onPress={() => setModalVisible(true)}
+                >
+                  View All Coupons
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <View
               style={{
-                padding: 2,
+                padding: 3,
                 borderRadius: 25,
                 borderColor: "#efe9e9",
                 borderWidth: 2,
@@ -439,92 +582,63 @@ const Index = () => {
                 marginTop: 10,
               }}
             >
-              <View
-                style={{
-                  width: "100%",
-                  padding: 5,
-                  flexDirection: "column",
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: GlobalStyles.bgcolor.backgroundColor,
-                    padding: 3,
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
+              {paymentMode.map((item, index) => {
+                return (
+                  <TouchableOpacity
                     style={{
-                      fontSize: 11.5,
-                      padding: 3,
-                      color: "#FFF",
-                      fontWeight: "600",
+                      width: "100%",
+                      padding: 5,
+                      flexDirection: "column",
                     }}
+                    key={index}
+                    onPress={() => handlePayModeIndex(index)}
                   >
-                    UPTO 10% DISCOUNT{" "}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    padding: 3,
-                    borderBottomLeftRadius: 10,
-                    borderBottomRightRadius: 10,
-                    borderColor: "grey",
-                    borderWidth: 0.8,
-                    alignItems: "center",
-                    borderTopWidth: 0, // Set the bottom border width to 0
-                  }}
-                >
-                  <Text style={{ fontSize: 10, padding: 3 }}>No DISCOUNT</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View
-                style={{
-                  width: "100%",
-                  padding: 5,
-                  flexDirection: "column",
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    borderColor: GlobalStyles.bgcolor.backgroundColor,
-                    padding: 3,
-                    borderWidth: 1,
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "#F2600A",
-                      fontWeight: "600",
-                      fontSize: 11.5,
-                    }}
-                  >
-                    {" "}
-                    ONLINE{" "}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    padding: 3,
-                    borderBottomLeftRadius: 10,
-                    borderBottomRightRadius: 10,
-                    borderColor: "grey",
-                    borderWidth: 0.8,
-                    alignItems: "center",
-                    borderTopWidth: 0,
-                  }}
-                >
-                  <Text style={{ fontSize: 10, padding: 3 }}>
-                    UPTO 10% DISCOUNT{" "}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                    <View
+                      style={{
+                        backgroundColor:
+                          payModeIndex === index
+                            ? GlobalStyles.bgcolor.backgroundColor
+                            : "#fff",
+                        borderColor:
+                          payModeIndex === index
+                            ? GlobalStyles.bgcolor.backgroundColor
+                            : "#F2600A",
+                        padding: 3,
+                        borderWidth: 1,
+                        borderTopLeftRadius: 10,
+                        borderTopRightRadius: 10,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: payModeIndex === index ? "#fff" : "#F2600A",
+                          fontWeight: "600",
+                          fontSize: 11.5,
+                          letterSpacing: 0.4,
+                        }}
+                      >
+                        {item.label1}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        padding: 3,
+                        borderBottomLeftRadius: 10,
+                        borderBottomRightRadius: 10,
+                        borderColor: "grey",
+                        borderWidth: 0.8,
+                        alignItems: "center",
+                        borderTopWidth: 0,
+                      }}
+                    >
+                      <Text style={{ fontSize: 10, padding: 3 }}>
+                        {item.label2}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         </View>
@@ -537,6 +651,7 @@ const Index = () => {
           backgroundColor: GlobalStyles.bgcolor.backgroundColor,
           padding: 7,
         }}
+        onPress={() => navigation.navigate("BookingDetails")}
       >
         <View>
           <Text style={GlobalStyles.footer_title}>670.80 / -</Text>

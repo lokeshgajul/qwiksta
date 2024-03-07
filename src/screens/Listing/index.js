@@ -4,9 +4,11 @@ import {
   Button,
   FlatList,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Text, View, Dimensions } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
@@ -22,6 +24,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import axios from "axios";
 
 const screenWidth = Dimensions.get("screen").width;
+const screenheight = Dimensions.get("screen").height;
 const Index = ({ navigation, route }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
@@ -90,7 +93,10 @@ const Index = ({ navigation, route }) => {
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.parentCard}>
+      <Pressable
+        style={styles.parentCard}
+        onPress={() => navigateToDetails({ itemId: item.id })}
+      >
         <TouchableOpacity
           style={{
             position: "absolute",
@@ -106,11 +112,11 @@ const Index = ({ navigation, route }) => {
         </TouchableOpacity>
         <View style={styles.card}>
           <ScrollView horizontal={true}>
-            {/* <Image style={styles.img} source={{ uri: item.thumbnail }} /> */}
-
-            <TouchableOpacity style={styles.childCard}>
-              <Image style={styles.img} source={{ uri: item.thumbnail }} />
-            </TouchableOpacity>
+            {item.thumbnail && (
+              <TouchableOpacity style={styles.childCard}>
+                <Image style={styles.img} source={{ uri: item.thumbnail }} />
+              </TouchableOpacity>
+            )}
           </ScrollView>
         </View>
         <View style={{ margin: 12, flexDirection: "column" }}>
@@ -207,7 +213,6 @@ const Index = ({ navigation, route }) => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              onPress={() => navigateToDetails({ itemId: item.id })}
             >
               <Text> 3 HOUR </Text>
               <Text style={styles.price}> {item.price} </Text>
@@ -222,7 +227,6 @@ const Index = ({ navigation, route }) => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              onPress={() => navigateToDetails({ itemId: item.id })}
             >
               <Text> 6 HOUR</Text>
               <Text style={styles.price}> {item.six_hours} </Text>
@@ -237,14 +241,13 @@ const Index = ({ navigation, route }) => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              onPress={() => navigateToDetails({ itemId: item.id })}
             >
               <Text> FULL DAY </Text>
               <Text style={styles.price}> {item.daily} </Text>
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </Pressable>
     );
   };
   return (
@@ -257,9 +260,9 @@ const Index = ({ navigation, route }) => {
         }}
       >
         <View style={styles.header}>
-          <View>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("Home")}>
             <AntDesign name="left" size={20} color="#fff" />
-          </View>
+          </TouchableWithoutFeedback>
           <View style={styles.inputParent}>
             <TextInput style={styles.input} placeholder="Search city..." />
             <View
@@ -374,7 +377,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     paddingHorizontal: 15,
-    marginBottom: 20,
+    marginBottom: 15,
     alignItems: "center",
     marginTop: 50,
   },
@@ -390,9 +393,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   parentCard: {
-    marginHorizontal: 20,
+    marginHorizontal: 15,
     backgroundColor: "#fff",
-    height: 325,
+    height: screenheight / 2.4,
     elevation: 2,
     borderRadius: 15,
     padding: 2,
@@ -400,7 +403,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   card: {
-    height: "40%",
+    height: screenheight / 6,
     width: screenWidth,
     borderRadius: 10,
     overflow: "hidden",
@@ -424,22 +427,22 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 10,
-    color: "#f15a00",
+    color: "#F2600A",
     fontWeight: "500",
   },
   text1: {
     fontSize: 10,
-    color: "#f15a00",
+    color: "#F2600A",
     fontWeight: "500",
   },
   text2: {
     fontSize: 10,
-    color: "#f15a00",
+    color: "#F2600A",
     fontWeight: "500",
   },
   price: {
     fontWeight: "800",
     letterSpacing: 0.5,
-    color: "#f15a00",
+    color: "#F2600A",
   },
 });

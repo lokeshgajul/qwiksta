@@ -10,44 +10,24 @@ import {
   Clipboard,
   ToastAndroid,
   StyleSheet,
+  StatusBar,
+  Pressable,
+  Modal,
 } from "react-native";
 import { Video } from "expo-av";
-// import Clipboard from "@react-native-clipboard/clipboard";
 import hotel from "../../assets/hotel.jpg";
 const screenWidth = Dimensions.get("screen").width;
-import Globalstyles from "../../Global/styles";
+import GlobalStyles from "../../Global/styles";
 import axios from "axios";
 import BottomTabNavigator from "../../navigation/BottomTab";
+import CityModal from "../../Modal/CityModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const Index = ({ navigation }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [dropdownOptions, setDropdownOptions] = useState([]);
   const [city, setcity] = useState([]);
   const [offers, setOffers] = useState([]);
   const [usps, setUsps] = useState([]);
-
-  const handleTextInputFocus = () => {
-    setDropdownOptions([
-      "Option 1",
-      "Option 2",
-      "Option 3",
-      "Option 3",
-      "Option 3",
-      "Option 3",
-      "Option 3",
-      "Option 3",
-      "Option 3",
-      "Option 3",
-    ]);
-    setShowDropdown(true);
-  };
-
-  const handleOptionPress = (option) => {
-    setSearchText(option);
-    setShowDropdown(false);
-  };
-
-  const fetchHome = async () => {
+  const [userId, setUserId] = useState();
+  const fetchHomeDetails = async () => {
     try {
       const response = await axios.get(`https://qwiksta.com/api/get-home`);
       if (response.status) {
@@ -80,20 +60,35 @@ const Index = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchHome();
+    const getUserIdFromStorage = async () => {
+      try {
+        const id = await AsyncStorage.getItem("userId");
+        console.log("Retrieved userId:", id);
+        setUserId(id); // Optionally update state if needed
+      } catch (error) {
+        console.error("Error retrieving userId:", error);
+      }
+    };
+
+    getUserIdFromStorage();
+  }, []);
+
+  useEffect(() => {
+    fetchHomeDetails();
   }, []);
   return (
     <View>
+      <StatusBar backgroundColor="#F2600A" barStyle="dark-content" />
       <ScrollView>
         <View
           style={{
-            backgroundColor: Globalstyles.bgcolor.backgroundColor,
+            backgroundColor: GlobalStyles.bgcolor.backgroundColor,
             height: 220,
           }}
         >
           <View
             style={{
-              // backgroundColor: Globalstyles.bgcolor.backgroundColor,
+              // backgroundColor: GlobalStyles.bgcolor.backgroundColor,
               height: 220,
               justifyContent: "center",
               paddingLeft: 23,
@@ -115,34 +110,7 @@ const Index = ({ navigation }) => {
               Looking for short stays? Think Qwiksta!{" "}
             </Text>
 
-            <TextInput
-              style={{
-                padding: 4,
-                backgroundColor: "#fff",
-                borderRadius: 6,
-                marginTop: 10,
-                position: "relative",
-                width: screenWidth - 40,
-                marginBottom: 10,
-              }}
-              placeholder="Search city..."
-              onFocus={handleTextInputFocus}
-              value={searchText}
-              onChangeText={(text) => setSearchText(text)}
-            />
-            {showDropdown && (
-              <View style={styles.dropdown}>
-                {dropdownOptions.map((option, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.option}
-                    onPress={() => handleOptionPress(option)}
-                  >
-                    <Text>{option}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+            <CityModal />
           </View>
 
           <View
@@ -150,8 +118,7 @@ const Index = ({ navigation }) => {
               height: 160,
               justifyContent: "center",
               alignItems: "center",
-              margin: -60,
-              zIndex: 0,
+              margin: -65,
             }}
           >
             {/* <View style={styles.videoContainer}> */}
@@ -183,7 +150,7 @@ const Index = ({ navigation }) => {
                     onPress={() => navigateToListing(city.name)}
                   >
                     <Image style={styles.images} source={{ uri: city.image }} />
-                    <Text style={Globalstyles.colorTitle}>{city.name} </Text>
+                    <Text style={GlobalStyles.colorTitle}>{city.name} </Text>
                   </TouchableOpacity>
                 );
               })
@@ -277,7 +244,7 @@ const Index = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={{ justifyContent: "center" }}>
+        <View style={{ justifyContent: "center", marginBottom: 60 }}>
           <Text
             style={{
               color: "#f55a00",
@@ -422,9 +389,9 @@ const styles = StyleSheet.create({
   },
 
   video: {
-    width: screenWidth - 45,
+    width: screenWidth - 40,
     height: "100%",
-    borderRadius: 15,
+    borderRadius: 10,
     zIndex: 0,
   },
   dropdown: {

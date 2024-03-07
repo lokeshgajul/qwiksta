@@ -1,13 +1,21 @@
 import React from "react";
-import { Text, View, Dimensions, Image, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  Dimensions,
+  Image,
+  StyleSheet,
+  StatusBar,
+} from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import hotel from "../../assets/hotel.jpg";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 const screenWidth = Dimensions.get("screen").width;
 import GlobalStyles from "../../Global/styles";
-const Index = () => {
+const Index = ({ navigation }) => {
   return (
     <View style={styles.container}>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <ScrollView>
         <View style={{ backgroundColor: "#ff7000" }}>
           <View style={styles.top_section}>
@@ -178,7 +186,10 @@ const Index = () => {
       </ScrollView>
 
       <View>
-        <TouchableOpacity style={GlobalStyles.footer}>
+        <TouchableOpacity
+          style={GlobalStyles.footer}
+          onPress={() => navigation.navigate("ShowBookings")}
+        >
           <Text style={GlobalStyles.footer_title}>GO TO BOOKINGS </Text>
         </TouchableOpacity>
       </View>

@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   },
   inputHeading: {
     paddingBottom: 5,
-    color: "#F35000",
+    color: "#F2600A",
     fontWeight: "800",
     letterSpacing: 0.3,
     fontSize: 14,
@@ -32,10 +32,10 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
   otpButton: {
-    marginTop: 5,
+    marginTop: 10,
   },
   otpText: {
-    backgroundColor: "#F35000",
+    backgroundColor: "#F2600A",
     padding: 8,
     textAlign: "center",
     borderRadius: 8,
@@ -45,10 +45,10 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    marginTop: 15,
+    marginTop: 10,
   },
   buttonText: {
-    backgroundColor: "#F35000",
+    backgroundColor: "#F2600A",
     padding: 10,
     textAlign: "center",
     borderRadius: 8,

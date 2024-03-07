@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Text, View, Dimensions, StyleSheet } from "react-native";
+import { Text, View, Dimensions, StyleSheet, Pressable } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import BottomTabNavigator from "../../navigation/BottomTab";
@@ -38,7 +38,7 @@ const Index = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View
+      <Pressable
         style={{
           flexDirection: "row",
           alignItems: "center",
@@ -47,12 +47,13 @@ const Index = ({ navigation }) => {
           height: 170,
           marginBottom: 20,
         }}
+        onPress={() => navigation.navigate("Home")}
       >
         <AntDesign name="left" size={20} color="#fff" />
         <Text style={{ color: "#fff", marginStart: 15, fontSize: 16 }}>
           My Profile
         </Text>
-      </View>
+      </Pressable>
 
       {profileData && (
         <View style={{ justifyContent: "center", alignItems: "center" }}>

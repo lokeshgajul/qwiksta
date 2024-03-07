@@ -15,6 +15,7 @@ const screenWidth = Dimensions.get("screen").width;
 const screenheight = Dimensions.get("screen").height;
 import styles from "./styles";
 import BottomTabNavigator from "../../navigation/BottomTab";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -23,6 +24,18 @@ const Login = ({ navigation }) => {
   const [emailMsg, setEmailMsg] = useState();
   const [error, setError] = useState();
   const [loggedIn, setLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  const StoreUserId = async (id) => {
+    try {
+      await AsyncStorage.setItem("userId", id.toString());
+      setUserId(id.toString());
+      console.log("Stored userId:", id);
+    } catch (error) {
+      console.error("Error storing userId:", error);
+      setUserId(null);
+    }
+  };
 
   const getOtp = async () => {
     if (!email) {
@@ -37,6 +50,7 @@ const Login = ({ navigation }) => {
       });
       if (response.data.status) {
         setEmailMsg(response.data.message);
+
         setTimeout(() => {
           setEmailMsg("");
         }, 3000);
@@ -65,6 +79,8 @@ const Login = ({ navigation }) => {
         console.log(response.data.message);
         setLoggedIn(true);
         setMessage(response.data.message);
+        StoreUserId(response.data.id);
+
         setTimeout(() => {
           setMessage("");
           navigation.replace("Home");
@@ -86,7 +102,7 @@ const Login = ({ navigation }) => {
   return (
     <ScrollView style={{ flex: 1 }}>
       {/* Default status bar */}
-
+      <StatusBar backgroundColor="#F2600A" barStyle="dark-content" />
       <Image
         source={bgimg}
         style={{
@@ -172,7 +188,7 @@ const Login = ({ navigation }) => {
         )}
         <Text style={styles.text}> Terms & Conditions | Privacy Policy </Text>
       </View>
-      <BottomTabNavigator />
+      {/* <BottomTabNavigator />/ */}
     </ScrollView>
   );
 };

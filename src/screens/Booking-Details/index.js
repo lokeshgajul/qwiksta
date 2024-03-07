@@ -6,6 +6,7 @@ import {
   ScrollView,
   Text,
   StyleSheet,
+  Pressable,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -26,7 +27,7 @@ const Index = ({ navigation }) => {
             paddingVertical: 5,
           }}
         >
-          <View
+          <Pressable
             style={{
               backgroundColor: "#f55a00",
               padding: 8,
@@ -34,9 +35,10 @@ const Index = ({ navigation }) => {
               alignItems: "center",
               marginTop: 14,
             }}
+            onPress={() => navigation.navigate("BookingForm")}
           >
             <AntDesign name="left" size={20} color="#fff" />
-          </View>
+          </Pressable>
           <View style={{ padding: 20, marginTop: 20 }}>
             <Text style={GlobalStyles.title}>Hotel Avenue</Text>
             <Text style={GlobalStyles.info}>
@@ -174,7 +176,10 @@ const Index = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={{ justifyContent: "flex-end" }}>
+      <TouchableOpacity
+        style={{ justifyContent: "flex-end" }}
+        onPress={() => navigation.navigate("Checkout")}
+      >
         <View
           style={{
             flexDirection: "row",

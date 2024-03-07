@@ -7,9 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
   Text,
+  FlatList,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import map from "../../assets/Hotel2.jpg";
 import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -32,6 +31,7 @@ const Details = ({ navigation, route }) => {
   const getDetailsOfHotel = async () => {
     try {
       const itemIdValue = itemID.itemId;
+      console.log(itemIdValue);
       const response = await axios.get(
         `https://qwiksta.com/api/single?id=${itemIdValue}`
       );
@@ -64,7 +64,7 @@ const Details = ({ navigation, route }) => {
             position: "absolute",
           }}
         >
-          <View
+          <TouchableOpacity
             style={{
               position: "absolute",
               top: 50,
@@ -74,9 +74,11 @@ const Details = ({ navigation, route }) => {
               padding: 6,
               borderRadius: 20,
             }}
+            onPress={() => navigation.goBack()}
           >
             <AntDesign name="left" size={20} color="#fff" />
-          </View>
+          </TouchableOpacity>
+
           <View
             style={{
               position: "absolute",
@@ -104,17 +106,16 @@ const Details = ({ navigation, route }) => {
             <Feather name="share-2" color="#fff" size={20} />
           </View>
         </View>
-        <ScrollView horizontal={true}>
-          {details.gallery.map((item, index) => {
-            return (
-              <View style={{ flexDirection: "row" }} key={index}>
-                <View style={styles.imgView}>
-                  <Image source={{ uri: item }} style={styles.img}></Image>
-                </View>
-              </View>
-            );
-          })}
-        </ScrollView>
+        <FlatList
+          data={details.gallery}
+          horizontal={true}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.imgView}>
+              <Image source={{ uri: item }} style={styles.img} />
+            </View>
+          )}
+        />
 
         <View style={{ backgroundColor: "#fff", paddingBottom: 20 }}>
           <View style={styles.button_container}>
@@ -210,24 +211,6 @@ const Details = ({ navigation, route }) => {
           }}
         >
           <Text style={styles.hearder}> Location</Text>
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: details.location_lat,
-              longitude: details.location_lng,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: details.location_lat,
-                longitude: details.location_lng,
-              }}
-              title={details.post_title}
-              description="This is the hotel's location"
-            />
-          </MapView>
         </View>
 
         <View style={{ backgroundColor: "#fff", padding: 20, marginTop: 10 }}>

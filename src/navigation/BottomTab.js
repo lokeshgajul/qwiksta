@@ -53,6 +53,7 @@ const BottomTabNavigator = () => {
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
         backgroundColor: "#fff",
+        elevation: 15,
       }}
     >
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
@@ -79,15 +80,15 @@ const BottomTabNavigator = () => {
 
         <TouchableOpacity
           style={{ alignItems: "center" }}
-          onPress={() => handleTabPress("Checkout")}
+          onPress={() => handleTabPress("Wishlist")}
         >
-          <AntDesign name="hearto" size={20} color={tabBarStyle("Checkout")} />
+          <AntDesign name="hearto" size={20} color={tabBarStyle("Wishlist")} />
           <Text
             style={{
               fontSize: 10.5,
               paddingTop: 5,
               letterSpacing: 0.4,
-              color: tabBarStyle("Checkout"),
+              color: tabBarStyle("Wishlist"),
             }}
           >
             WISHLIST
@@ -96,15 +97,19 @@ const BottomTabNavigator = () => {
 
         <TouchableOpacity
           style={{ alignItems: "center" }}
-          onPress={() => handleTabPress("Booking")}
+          onPress={() => handleTabPress("ShowBookings")}
         >
-          <AntDesign name="book" size={20} color={tabBarStyle("Booking")} />
+          <AntDesign
+            name="book"
+            size={20}
+            color={tabBarStyle("ShowBookings")}
+          />
           <Text
             style={{
               fontSize: 10.5,
               paddingTop: 5,
               letterSpacing: 0.4,
-              color: tabBarStyle("Booking"),
+              color: tabBarStyle("ShowBookings"),
             }}
           >
             BOOKINGS
